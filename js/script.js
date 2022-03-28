@@ -44,6 +44,24 @@ generateButton.addEventListener('click', function () {
 
 });
 
+// GetRandomNumber
+const getRandomNum = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+// GenerateBombs
+function generateBombs(totalBombs, totalNumber) {
+    const bombs = [];
+    while (bombs.length < totalBombs) {
+        let randNumber = getRandomNum(1, totalNumber);
+        // No duplicates
+        if (!bombs.includes(randNumber)) bombs.push(randNumber);
+    }
+    return bombs;
+}
+
+
+console.log(generateBombs(16, 16))
+
+
 // cell.addEventListener('toggle', function(cell) {
 //     cell.classList.add = 'clicked';
 // });
