@@ -1,67 +1,135 @@
-console.log('JS OK');
 
-// Consegna
-// L'utente indica TRAMITE DOM un livello di difficoltà in base al quale viene generata una griglia di gioco quadrata, in cui ogni cella contiene un numero tra quelli compresi in un range:
-// con difficoltà 1 => tra 1 e 100
-// con difficoltà 2 => tra 1 e 81
-// con difficoltà 3 => tra 1 e 49
-// Quando l'utente clicca su ogni cella, la cella cliccata si colora di azzurro.
 
-// ! RECUPERO GLI ELEMENTI DAL DOM
-let difficulty;
-const grid = document.getElementById('grid');
-const generateButton = document.getElementById('generate');
 
-let col;
 
-generateButton.addEventListener('click', function () {
+// Getting elements
+const select = document.getElementById("select");
+const grid = document.getElementById("grid");
+const button = document.getElementById("play");
+const resultMessage = document.getElementById('game-over-message');
 
-    grid.innerText = '';
-    generateButton.innerText = 'Ricomincia';
+const getRandNum = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-    difficulty = document.getElementById('number-of-cells').value;
-    // if (difficulty === 100) {
-    //     col = Math.sqrt(difficulty);
-    // } else if (difficulty === 81){
-    //     col = Math.sqrt(difficulty);
-    // } else {
-    //     col = Math.sqrt(difficulty);
-    // };
-    col = Math.sqrt(difficulty);
-    console.log(col);
-    for (i = 0; i < difficulty; i++) {
-        const cell = document.createElement('div');
-        cell.classList.add('cell');
-        cell.style.width = `calc(100% / ${col})`
-        cell.style.height = `calc(100% / ${col})`
-        cell.innerText = i + 1;
-        cell.addEventListener('click', function () {
-            cell.classList.toggle('clicked');
-        })
+// Game Starting Funcion
+function start() {
+    grid.innerHTML = '';
+    button.innerText = 'RESTART'
 
-        grid.appendChild(cell);
+    // Variables
+    let attempts = 0;
+    const totalBombs = 16;
+
+    let col;
+
+    switch (select.value) {
+        case "easy":
+            col = 10;
+            break;
+        case "hard":
+            col = 7;
+            break;
+        case "normal":
+            col = 9;
+            break;
     }
 
-});
+    const totalCells = col * col;
 
-// GetRandomNumber
-const getRandomNum = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const maxAttempts = totalCells - totalBombs;
 
-// GenerateBombs
-function generateBombs(totalBombs, totalNumber) {
-    const bombs = [];
-    while (bombs.length < totalBombs) {
-        let randNumber = getRandomNum(1, totalNumber);
-        // No duplicates
-        if (!bombs.includes(randNumber)) bombs.push(randNumber);
+
+    // FUNCTIONS
+    // GenerateBombs
+    const generateBombs = (totalBombs, totalNumber) => {
+        const bombs = [];
+        while (bombs.length < totalBombs) { // il numero di bombe è inferiore a 16
+            const randNumber = getRandNum(1, totalNumber);
+            if (!bombs.includes(randNumber)) { // Controllo se c'è nell'array di bombe
+                bombs.push(randNumber);
+            }
+        }
+        return bombs;
     }
-    return bombs;
+
+    // GenerateGrid
+    const generateGrid = (cellsNumber, cellsPerRow, bombs) => {
+        for (let i = 1; i <= cellsNumber; i++) {
+            const cell = createCell(i, cellsPerRow);
+            cell.addEventListener('click', (event) => onCellClick(event.target, bombs, i));
+            grid.appendChild(cell);
+        }
+    }
+
+    // CreateCell
+    const createCell = (cellNumber, cellsPerRow) => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.innerText = cellNumber;
+        const wh = `calc(100% / ${cellsPerRow})`;
+        cell.style.height = wh;
+        cell.style.width = wh;
+        return cell;
+    }
+
+    // OnCellClick
+    const onCellClick = (clickedCell, bombs, number) => {
+        const disabledCell = disableCell(clickedCell);
+
+        if (bombs.includes(number)) {
+            gameOver(bombs, attempts, true);
+        } else {
+            disabledCell.classList.add("safe")
+            attempts++;
+            if (attempts === maxAttempts) {
+                gameOver(bombs, attempts, false);
+            }
+        }
+    }
+
+    // DisableCell
+    const disableCell = cell => {
+        const clone = cell.cloneNode(); //! .cloneNode() copia l'ememnto senza nulla dentro
+        clone.innerText = cell.innerText;
+        clone.classList.add('disabled');
+        cell.parentNode.replaceChild(clone, cell);
+
+        return clone;
+    }
+
+    // ShowBombs
+    const showBombs = (bombs) => {
+        const cells = document.querySelectorAll('.cell');
+        for (let i = 0; i < totalCells; i++) {
+            const cell = cells[i];
+            const disabledCell = disableCell(cell);
+            const cellNumber = parseInt(disabledCell.innerText);
+            if (bombs.includes(cellNumber)) {
+                disabledCell.classList.add('bomb');
+            }
+        }
+    }
+
+    // GameOver
+    const gameOver = (bombs, attempts) => {
+        const allCells = grid.querySelectorAll('.cell');
+
+        for (let i = 0; i < allCells.length; i++) {
+            allCells[i].removeEventListener('click', onCellClick);
+        }
+
+        showBombs(bombs);
+
+        // Game Over Message
+        const GameOverMessageGenerator = () => {
+            return (attempts === maxAttempts) ? `You Won! You score is ${attempts}.` : `You lost... Your score is ${attempts}.`;
+        }
+        resultMessage.innerHTML = GameOverMessageGenerator();
+    }
+
+    // Calling functions
+    const bombs = generateBombs(totalBombs, totalCells)
+    generateGrid(totalCells, col, bombs);
 }
 
-
-console.log(generateBombs(16, 16))
-
-
-// cell.addEventListener('toggle', function(cell) {
-//     cell.classList.add = 'clicked';
-// });
+// Event Listener for the play button
+button.addEventListener("click", () => start());

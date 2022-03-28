@@ -1,14 +1,6 @@
-/* GENERICS */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 /* HEADER */
 header {
     height: 100px;
-    line-height: 100px;
     background-color: dodgerblue;
     color: white;
     display: flex;
@@ -16,35 +8,31 @@ header {
     align-items: center;
 }
 
-header  select {
+header select {
     height: 40px;
     width: 100px;
 }
 
-header > div > button {
-    width: 100px;
-    height: 40px;
-}
+
 
 /* MAIN */
+#game-over-message {
+    color: white;
+}
 
-main {
+body {
     background-color: lightgreen;
-    height: 600px;
-    padding-top: 50px;
 }
 
 #grid {
-    border: 1px solid white;
     height: 500px;
     width: 500px;
-    margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
 }
 
 .cell {
-    border: 1px dashed white;
+    border: 1px solid white;
     color: white;
     cursor: pointer;
     display: flex;
@@ -52,7 +40,12 @@ main {
     justify-content: center;
 }
 
-
-.clicked {
+.cell.safe {
+    cursor: not-allowed;
     background-color: lightblue;
+}
+
+.cell.bomb {
+    cursor: not-allowed;
+    background-color: red;
 }
