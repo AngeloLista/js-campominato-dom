@@ -1,0 +1,58 @@
+/* GENERICS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* HEADER */
+header {
+    height: 100px;
+    line-height: 100px;
+    background-color: dodgerblue;
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+header  select {
+    height: 40px;
+    width: 100px;
+}
+
+header > div > button {
+    width: 100px;
+    height: 40px;
+}
+
+/* MAIN */
+
+main {
+    background-color: lightgreen;
+    height: 600px;
+    padding-top: 50px;
+}
+
+#grid {
+    border: 1px solid white;
+    height: 500px;
+    width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.cell {
+    border: 1px dashed white;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.clicked {
+    background-color: lightblue;
+}
